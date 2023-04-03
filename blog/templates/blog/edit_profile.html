@@ -1,0 +1,14 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+<div class="row">
+    <div class="col-sm-8 offset-2">
+        <h4 class="alert alert-info">Update User Profile</h4>
+        <form action="" method="post">
+            {% csrf_token %}
+            {{form.as_p}}
+            <input type="submit" class="btn btn-success" value="Update">
+            {% comment %} <a href="{% url '/'%}" class="btn btn-info">Back To Home</a> {% endcomment %}
+        </form>
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,105 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+<div>
+<img style="height:200px; width:100%" src="{{ post.featured.url }}">
+</div>
+    <article class="post">
+        <aside class="actions">
+            {% if user.is_authenticated %}
+                <a class="btn btn-secondary" href="{% url 'post_edit' slug=post.slug %}">
+                    {% include './icons/pencil-fill.svg' %}
+                </a>
+
+                {% comment %} <a class="btn btn-default" href="<div data-gb-custom-block data-tag="url" data-0='post_remove'></div>"><span class="glyphicon glyphicon-remove"></span></a> {% endcomment %}
+            {% endif %}
+        </aside>
+        {% if post.published_date %}
+            <time class="date">
+                {{ post.published_date }}
+            </time>
+        {% endif %}
+
+        {% comment %} <img src="{{ post.thumbnail.url }}"  alt="image" border-radius="20px 80px 70px" width="50" height="100" class="center" style="
+        position: relative;
+        left: -67px;
+        top: 103px;
+        border-radius:100px 100px 100px 100px;
+    """> {% endcomment %}
+        <div style="position: relative; top: 30px; display:inline;">
+            <img style="border-radius: 50%; width:70px; height:70px;" src="{{ post.thumbnail.url }}">
+        </div>
+        <div style="position: relative; left: 90px; bottom: 40px;">
+        <h2>{{ post.title }}</h2>
+        <b>{{ post.category|linebreaksbr }}</b>
+    </div>
+    <div>
+        <p>{{ post.text|linebreaksbr }}</p>
+    </div>
+
+        <b>Tags</b>
+        {% for tg in post.tag.all %}
+        <p>{{ tg }}</p>
+        {% endfor %}
+    </article>
+
+    <h3>Comment</h3>
+    <div style="border: 1px solid black; width: 38%; height: 28%; padding: 15px; margin-bottom: 70px; background-color:rgba(0,0,0,.03)">
+    <form method="POST" class="post-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-secondary">Submit</button>
+    </form>
+    </div>
+
+
+
+
+    <div class="card" style="width: 27rem;">
+        <div class="card-header">
+          Comments
+        </div>
+        {% for comments in comment %}
+        <div class="card mx-3">
+            {% if comments.is_parent %}
+                <div class="card-body">
+                    <h5 class="card-title"><p>{{ comments.name }} <span style="color: red; margin-left: 20px;">{{ comments.email }}</span></p></h5>
+                    <p style="display:inline" class="card-text">{{ comments.comment }}</p>
+                    <div class="comment-thread">
+                        <!-- Comment 1 start -->
+
+                        {% comment %} <h6 class="mx-4">Replies:</h6> {% endcomment %}
+                        {% for replies in comments.children %}
+                            <p class="mb-1">&nbsp; &nbsp; &nbsp;<b>{{ replies.name }} : </b> {{ replies.comment }}</p>
+                        {% endfor %}
+                        
+                        <div class="comment-body">
+                            <button type="button" id="formButton-{{ comments.id }}" class="replay-form">Reply</button>
+                        </div>
+            
+
+                    </div> 
+                </div>  
+            {% endif %}   
+            <div>
+                <form method="POST" id="aptformButton-{{ comments.id }}" style="display:none;">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <input type="hidden" name="comments.id" value="{{ comments.id }}">
+                    <button type="submit">Submit</button>
+                </form>          
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+<script>
+    $(document).ready(function(){
+        $(document).on("click",".replay-form",function(){
+            const formId = $(this).attr('id');
+            $('#apt'+formId).toggle();
+        });
+    });
+</script>
+
+{% endblock %}
